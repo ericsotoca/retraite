@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu pour Bien Démarrer sa Retraite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-r from-green-100 to-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full text-center">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Bien Démarrer sa Retraite</h1>
+        <p class="text-gray-600 mb-6">Prêt à planifier votre nouvelle vie ?</p>
+        <div id="question" class="text-lg text-gray-700 mb-6 italic min-h-[100px] flex items-center justify-center">"Tirez une question pour commencer..."</div>
+        <button onclick="drawQuestion()" class="bg-green-500 text-white font-semibold py-2 px-4 rounded hover:bg-green-600 transition">Tirer une question</button>
+    </div>
+
+    <script>
+        const questions = [
+            "Quel lieu rêvez-vous d’habiter pendant votre retraite ?",
+            "Quelle activité nouvelle voulez-vous essayer dès la retraite ?",
+            "Comment imaginez-vous vos journées typiques en retraite ?",
+            "Quel hobby oublié aimeriez-vous reprendre ?",
+            "Quel budget prévoyez-vous pour vos loisirs ?",
+            "Quelle région vous attire pour voyager en retraite ?",
+            "Comment voulez-vous rester en contact avec vos collègues ?",
+            "Quel sport doux souhaitez-vous pratiquer régulièrement ?",
+            "Quelle cause charitable voulez-vous soutenir ?",
+            "Comment prévoyez-vous gérer votre temps libre ?",
+            "Quel projet DIY (fait maison) vous tente ?",
+            "Comment imaginez-vous vos vacances annuelles ?",
+            "Quelle langue aimeriez-vous apprendre ou perfectionner ?",
+            "Comment voulez-vous entretenir votre santé mentale ?",
+            "Quel club ou association vous intéresserait ?",
+            "Comment prévoyez-vous vos repas quotidiens ?",
+            "Quelle routine matinale idéale vous motive ?",
+            "Comment voulez-vous célébrer votre premier jour de retraite ?",
+            "Quel livre ou sujet voulez-vous explorer en profondeur ?",
+            "Comment imaginez-vous vos relations avec vos petits-enfants ?",
+            "Quelle formation ou cours vous attire ?",
+            "Comment voulez-vous organiser votre espace de vie ?",
+            "Quel voyage de rêve planifiez-vous en premier ?",
+            "Comment prévoyez-vous vos dépenses de santé ?",
+            "Quelle activité créative voulez-vous développer ?",
+            "Comment voulez-vous rester actif physiquement ?",
+            "Quel héritage voulez-vous laisser à votre famille ?",
+            "Comment imaginez-vous vos soirées en retraite ?",
+            "Quelle technologie nouvelle voulez-vous maîtriser ?",
+            "Comment prévoyez-vous des moments de détente ?",
+            "Quel jardinage ou bricolage vous inspire ?",
+            "Comment voulez-vous voyager avec votre conjoint(e) ?",
+            "Quelle tradition familiale voulez-vous instaurer ?",
+            "Comment imaginez-vous vos weekends en retraite ?",
+            "Quel bénévolat vous attire ?",
+            "Comment voulez-vous gérer votre pension financière ?",
+            "Quelle musique ou art voulez-vous redécouvrir ?",
+            "Comment prévoyez-vous des sorties culturelles ?",
+            "Quel sport d’équipe aimeriez-vous rejoindre ?",
+            "Comment imaginez-vous votre alimentation saine ?",
+            "Quelle aventure locale voulez-vous explorer ?",
+            "Comment voulez-vous rester connecté avec vos amis ?",
+            "Quel projet communautaire vous motive ?",
+            "Comment prévoyez-vous vos vacances d’hiver ?",
+            "Quelle relaxation (yoga, méditation) vous attire ?",
+            "Comment imaginez-vous votre rôle dans la famille ?",
+            "Quel souvenir de retraite voulez-vous créer ?",
+            "Comment voulez-vous célébrer vos anniversaires ?",
+            "Quelle passion voulez-vous transmettre aux autres ?"
+        ];
+
+        function drawQuestion() {
+            const randomIndex = Math.floor(Math.random() * questions.length);
+            document.getElementById('question').innerText = questions[randomIndex];
+        }
+    </script>
+</body>
+</html>
