@@ -3,74 +3,781 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeu pour Bien Démarrer sa Retraite</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>La Retraite, une Seconde Vie - Programme Interactif</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2c5f49;
+            --secondary-color: #7fb069;
+            --accent-color: #d4a574;
+            --background: #faf8f5;
+            --text-dark: #2d3436;
+            --text-light: #636e72;
+            --border: #ddd;
+            --success: #00b894;
+            --warning: #fdcb6e;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, var(--background) 0%, #f5f3f0 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            background: white;
+            height: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .chapter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .chapter-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .chapter-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .chapter-card.completed {
+            border-color: var(--success);
+            background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+        }
+
+        .chapter-card.current {
+            border-color: var(--accent-color);
+            background: linear-gradient(135deg, #fff9f0 0%, #fef4e8 100%);
+        }
+
+        .chapter-number {
+            background: var(--primary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .chapter-card.completed .chapter-number {
+            background: var(--success);
+        }
+
+        .chapter-card.current .chapter-number {
+            background: var(--accent-color);
+        }
+
+        .chapter-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .chapter-description {
+            color: var(--text-light);
+            font-size: 0.95em;
+            margin-bottom: 15px;
+        }
+
+        .exercise-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8em;
+        }
+
+        .status-icon.completed {
+            background: var(--success);
+        }
+
+        .status-icon.current {
+            background: var(--accent-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--text-dark);
+        }
+
+        .exercise-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid var(--accent-color);
+        }
+
+        .exercise-title {
+            font-size: 1.3em;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .question-group {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .question-label {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 10px rgba(127, 176, 105, 0.2);
+        }
+
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            background: var(--text-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-export {
+            background: var(--accent-color);
+        }
+
+        .stats-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--background) 0%, #f0f0f0 100%);
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .tips-section {
+            background: linear-gradient(135deg, #fff9f0 0%, #fef4e8 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 2px solid var(--accent-color);
+        }
+
+        .tips-title {
+            color: var(--primary-color);
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .modal-content {
+                margin: 20px;
+                padding: 20px;
+                max-width: calc(100% - 40px);
+            }
+            
+            .chapter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-r from-green-100 to-gray-100 min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full text-center">
-        <h1 class="text-2xl font-bold text-gray-800 mb-4">Bien Démarrer sa Retraite</h1>
-        <p class="text-gray-600 mb-6">Prêt à planifier votre nouvelle vie ?</p>
-        <div id="question" class="text-lg text-gray-700 mb-6 italic min-h-[100px] flex items-center justify-center">"Tirez une question pour commencer..."</div>
-        <button onclick="drawQuestion()" class="bg-green-500 text-white font-semibold py-2 px-4 rounded hover:bg-green-600 transition">Tirer une question</button>
+<body>
+    <div class="container">
+        <header class="fade-in">
+            <h1>La Retraite, une Seconde Vie</h1>
+            <p class="subtitle">Un dialogue pour réinventer son avenir - Programme Interactif</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p>Progression: <span id="progressText">0/10 chapitres complétés</span></p>
+        </header>
+
+        <div class="stats-section fade-in">
+            <h2>Vos statistiques</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="completedChapters">0</div>
+                    <div class="stat-label">Chapitres complétés</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalReflections">0</div>
+                    <div class="stat-label">Réflexions enregistrées</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="daysActive">1</div>
+                    <div class="stat-label">Jours d'activité</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tips-section fade-in">
+            <h3 class="tips-title">💡 Conseils pour utiliser cette application</h3>
+            <ul>
+                <li>Prenez votre temps avec chaque exercice - la qualité prime sur la rapidité</li>
+                <li>Soyez honnête dans vos réflexions, c'est pour vous</li>
+                <li>Revenez régulièrement sur vos réponses précédentes pour voir votre évolution</li>
+                <li>N'hésitez pas à exporter vos données pour les sauvegarder</li>
+                <li>Chaque petit pas compte dans votre transformation</li>
+            </ul>
+        </div>
+
+        <div class="chapter-grid" id="chapterGrid">
+            <!-- Les chapitres seront générés par JavaScript -->
+        </div>
+
+        <div class="stats-section">
+            <button class="btn btn-export" onclick="exportData()">📋 Exporter mes réponses</button>
+            <button class="btn btn-secondary" onclick="resetData()">🔄 Recommencer</button>
+        </div>
+    </div>
+
+    <!-- Modal pour les exercices -->
+    <div id="exerciseModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <p id="modalDescription"></p>
+            </div>
+            <div id="modalContent"></div>
+        </div>
     </div>
 
     <script>
-        const questions = [
-            "Quel lieu rêvez-vous d’habiter pendant votre retraite ?",
-            "Quelle activité nouvelle voulez-vous essayer dès la retraite ?",
-            "Comment imaginez-vous vos journées typiques en retraite ?",
-            "Quel hobby oublié aimeriez-vous reprendre ?",
-            "Quel budget prévoyez-vous pour vos loisirs ?",
-            "Quelle région vous attire pour voyager en retraite ?",
-            "Comment voulez-vous rester en contact avec vos collègues ?",
-            "Quel sport doux souhaitez-vous pratiquer régulièrement ?",
-            "Quelle cause charitable voulez-vous soutenir ?",
-            "Comment prévoyez-vous gérer votre temps libre ?",
-            "Quel projet DIY (fait maison) vous tente ?",
-            "Comment imaginez-vous vos vacances annuelles ?",
-            "Quelle langue aimeriez-vous apprendre ou perfectionner ?",
-            "Comment voulez-vous entretenir votre santé mentale ?",
-            "Quel club ou association vous intéresserait ?",
-            "Comment prévoyez-vous vos repas quotidiens ?",
-            "Quelle routine matinale idéale vous motive ?",
-            "Comment voulez-vous célébrer votre premier jour de retraite ?",
-            "Quel livre ou sujet voulez-vous explorer en profondeur ?",
-            "Comment imaginez-vous vos relations avec vos petits-enfants ?",
-            "Quelle formation ou cours vous attire ?",
-            "Comment voulez-vous organiser votre espace de vie ?",
-            "Quel voyage de rêve planifiez-vous en premier ?",
-            "Comment prévoyez-vous vos dépenses de santé ?",
-            "Quelle activité créative voulez-vous développer ?",
-            "Comment voulez-vous rester actif physiquement ?",
-            "Quel héritage voulez-vous laisser à votre famille ?",
-            "Comment imaginez-vous vos soirées en retraite ?",
-            "Quelle technologie nouvelle voulez-vous maîtriser ?",
-            "Comment prévoyez-vous des moments de détente ?",
-            "Quel jardinage ou bricolage vous inspire ?",
-            "Comment voulez-vous voyager avec votre conjoint(e) ?",
-            "Quelle tradition familiale voulez-vous instaurer ?",
-            "Comment imaginez-vous vos weekends en retraite ?",
-            "Quel bénévolat vous attire ?",
-            "Comment voulez-vous gérer votre pension financière ?",
-            "Quelle musique ou art voulez-vous redécouvrir ?",
-            "Comment prévoyez-vous des sorties culturelles ?",
-            "Quel sport d’équipe aimeriez-vous rejoindre ?",
-            "Comment imaginez-vous votre alimentation saine ?",
-            "Quelle aventure locale voulez-vous explorer ?",
-            "Comment voulez-vous rester connecté avec vos amis ?",
-            "Quel projet communautaire vous motive ?",
-            "Comment prévoyez-vous vos vacances d’hiver ?",
-            "Quelle relaxation (yoga, méditation) vous attire ?",
-            "Comment imaginez-vous votre rôle dans la famille ?",
-            "Quel souvenir de retraite voulez-vous créer ?",
-            "Comment voulez-vous célébrer vos anniversaires ?",
-            "Quelle passion voulez-vous transmettre aux autres ?"
+        // Structure des données des chapitres
+        const chapters = [
+            {
+                id: 1,
+                title: "Le Grand Vide ou le Champ des Possibles ?",
+                description: "Cartographier votre point de départ et observer votre état actuel",
+                exercise: {
+                    title: "Votre Journal de Bord – Cartographier le Point de Départ",
+                    objective: "Prendre conscience de votre état actuel sans jugement, et commencer à identifier les contours de votre transition.",
+                    questions: [
+                        {
+                            label: "La Météo Intérieure - Comment vous sentez-vous aujourd'hui ?",
+                            key: "meteo_interieure",
+                            placeholder: "Décrivez vos émotions : joie, tristesse, colère, anxiété, ennui, sérénité, confusion, etc."
+                        },
+                        {
+                            label: "Le Poids du Passé - Qu'est-ce qui vous a manqué de votre ancienne vie aujourd'hui ?",
+                            key: "poids_passe",
+                            placeholder: "Pensez aux aspects concrets ou immatériels qui vous manquent..."
+                        },
+                        {
+                            label: "La Légèreté du Présent - De quoi êtes-vous heureux de vous être débarrassé ?",
+                            key: "legerete_present",
+                            placeholder: "Stress, trajets, réunions, pressions... Célébrez ces libérations"
+                        }
+                    ]
+                }
+            },
+            {
+                id: 2,
+                title: "Dire au revoir pour mieux se retrouver",
+                description: "Faire le deuil de votre identité professionnelle et honorer votre passé",
+                exercise: {
+                    title: "La Lettre de Transition",
+                    objective: "Honorer votre passé, exprimer les émotions associées et marquer symboliquement la fin d'un cycle.",
+                    questions: [
+                        {
+                            label: "Lettre de gratitude - Remerciez votre ancienne carrière/vie",
+                            key: "lettre_gratitude",
+                            placeholder: "Chère Carrière... Merci pour tout ce que tu m'as apporté..."
+                        },
+                        {
+                            label: "Les griefs et regrets - Exprimez ce que cette relation vous a coûté",
+                            key: "griefs_regrets",
+                            placeholder: "Je t'en veux pour... Je regrette... Je pardonne..."
+                        },
+                        {
+                            label: "L'adieu - Annoncez clairement que ce chapitre est terminé",
+                            key: "adieu",
+                            placeholder: "Aujourd'hui, nos chemins se séparent... Je te dis au revoir et..."
+                        }
+                    ]
+                }
+            },
+            {
+                id: 3,
+                title: "Les Cartes Routières de notre Esprit",
+                description: "Identifier et transformer vos croyances limitantes",
+                exercise: {
+                    title: "Devenir l'Architecte de ses Croyances",
+                    objective: "Identifier une croyance limitante et la transformer en croyance aidante.",
+                    questions: [
+                        {
+                            label: "Croyance limitante - Quelle règle vous empêche d'avancer ?",
+                            key: "croyance_limitante",
+                            placeholder: "Je ne peux pas... parce que... / Il est trop tard pour..."
+                        },
+                        {
+                            label: "Déconstruction - D'où vient cette croyance ? Est-elle vraie à 100% ?",
+                            key: "deconstruction",
+                            placeholder: "Origine, validité, coût de cette croyance..."
+                        },
+                        {
+                            label: "Nouvelle croyance - Formulez une croyance plus aidante",
+                            key: "nouvelle_croyance",
+                            placeholder: "Désormais, je crois que... J'ai le droit de..."
+                        }
+                    ]
+                }
+            },
+            {
+                id: 4,
+                title: "L'Art de Vivre, Ici et Maintenant",
+                description: "Développer la pleine conscience et l'ancrage dans le présent",
+                exercise: {
+                    title: "L'Ancre de Pleine Conscience",
+                    objective: "Créer un îlot de calme quotidien en vous ancrant dans le présent.",
+                    questions: [
+                        {
+                            label: "Activité choisie - Quelle activité quotidienne sera votre ancre ?",
+                            key: "activite_ancre",
+                            placeholder: "Boire le café du matin, se brosser les dents, marcher..."
+                        },
+                        {
+                            label: "Expérience sensorielle - Comment cette activité engage-t-elle vos 5 sens ?",
+                            key: "experience_sensorielle",
+                            placeholder: "Vue, toucher, odorat, goût, ouïe - décrivez vos sensations"
+                        },
+                        {
+                            label: "Réflections - Comment cette pratique change-t-elle votre rapport au quotidien ?",
+                            key: "reflexions_pleine_conscience",
+                            placeholder: "Difficultés rencontrées, nouvelles observations, bienfaits..."
+                        }
+                    ]
+                }
+            },
+            {
+                id: 5,
+                title: "À la recherche de son Nord intérieur",
+                description: "Explorer vos passions et talents pour découvrir votre Ikigaï",
+                exercise: {
+                    title: "L'Archéologie de votre Ikigaï (Partie 1)",
+                    objective: "Identifier vos passions profondes et vos talents uniques.",
+                    questions: [
+                        {
+                            label: "Ce que j'aime - Vos passions et centres d'intérêt",
+                            key: "passions",
+                            placeholder: "Ce qui vous fait vibrer, perdre la notion du temps, vous passionne..."
+                        },
+                        {
+                            label: "Ce pour quoi je suis doué(e) - Vos talents naturels",
+                            key: "talents",
+                            placeholder: "Ce que vous faites facilement, vos compétences reconnues..."
+                        },
+                        {
+                            label: "Découvertes - Qu'avez-vous redécouvert sur vous-même ?",
+                            key: "decouvertes",
+                            placeholder: "Talents oubliés, passions d'enfance retrouvées..."
+                        }
+                    ]
+                }
+            },
+            {
+                id: 6,
+                title: "Révéler le Super-Héros en Sommeil",
+                description: "Identifier et activer vos forces de caractère",
+                exercise: {
+                    title: "Mettez votre Cape de Super-Héros",
+                    objective: "Identifier vos forces de caractère et les utiliser consciemment.",
+                    questions: [
+                        {
+                            label: "Mes 5 forces principales - Identifiez vos forces de caractère signatures",
+                            key: "forces_caractere",
+                            placeholder: "Créativité, gentillesse, persévérance, curiosité, humour..."
+                        },
+                        {
+                            label: "Forces en action - Décrivez des moments où vous avez utilisé ces forces",
+                            key: "forces_action",
+                            placeholder: "Situations concrètes où vos forces vous ont servi..."
+                        },
+                        {
+                            label: "Défi hebdomadaire - Comment utilisez-vous vos forces de manière nouvelle ?",
+                            key: "defi_forces",
+                            placeholder: "Actions concrètes pour activer vos forces au quotidien..."
+                        }
+                    ]
+                }
+            },
+            {
+                id: 7,
+                title: "Devenir l'auteur de sa propre légende",
+                description: "Créer le récit inspirant de votre nouvelle vie",
+                exercise: {
+                    title: "Rédigez la Quatrième de Couverture de votre Prochain Chapitre",
+                    objective: "Créer un nouveau récit personnel inspirant qui servira de boussole.",
+                    questions: [
+                        {
+                            label: "Titre de votre Tome 2 - Comment nommez-vous votre nouveau chapitre ?",
+                            key: "titre_tome2",
+                            placeholder: "La Renaissance de [Votre Prénom], Chroniques d'une Liberté Retrouvée..."
+                        },
+                        {
+                            label: "Résumé inspirant - Rédigez la quatrième de couverture de votre vie",
+                            key: "resume_inspirant",
+                            placeholder: "Après avoir longtemps été... il/elle décide maintenant de..."
+                        },
+                        {
+                            label: "Vision personnelle - Qui voulez-vous devenir ?",
+                            key: "vision_personnelle",
+                            placeholder: "La transformation que vous envisagez, vos nouvelles manières d'être..."
+                        }
+                    ]
+                }
+            },
+            {
+                id: 8,
+                title: "L'Héritage que nous laissons au Monde",
+                description: "Définir votre contribution et donner du sens à votre nouvelle vie",
+                exercise: {
+                    title: "Définir votre Contribution",
+                    objective: "Identifier des pistes pour transformer vos talents en contributions au monde.",
+                    questions: [
+                        {
+                            label: "Mes dons - Ce que vous avez à offrir (talents, passions, forces)",
+                            key: "mes_dons",
+                            placeholder: "Synthèse de vos découvertes précédentes..."
+                        },
+                        {
+                            label: "Les besoins - De quoi votre entourage/communauté a-t-il besoin ?",
+                            key: "besoins_monde",
+                            placeholder: "Besoins de lien social, transmission, aide pratique, beauté..."
+                        },
+                        {
+                            label: "Idées de contribution - Comment connecter vos dons aux besoins ?",
+                            key: "idees_contribution",
+                            placeholder: "Projets concrets pour mettre vos talents au service des autres..."
+                        }
+                    ]
+                }
+            },
+            {
+                id: 9,
+                title: "Écouter les Murmures du Corps",
+                description: "Développer votre intelligence somatique et votre posture ressource",
+                exercise: {
+                    title: "Le Scan Corporel et la Posture Ressource",
+                    objective: "Développer votre écoute corporelle et utiliser la posture comme levier.",
+                    questions: [
+                        {
+                            label: "Messages du corps - Que vous dit votre corps sur votre état actuel ?",
+                            key: "messages_corps",
+                            placeholder: "Tensions, sensations, zones de confort ou d'inconfort..."
+                        },
+                        {
+                            label: "Posture ressource - Décrivez votre posture du 'Bâtisseur de Seconde Vie'",
+                            key: "posture_ressource",
+                            placeholder: "Comment vous tenez-vous quand vous incarnez votre nouveau moi ?"
+                        },
+                        {
+                            label: "Expériences corporelles - Comment votre corps réagit-il aux changements ?",
+                            key: "experiences_corporelles",
+                            placeholder: "Changements ressentis, nouvelles habitudes corporelles..."
+                        }
+                    ]
+                }
+            },
+            {
+                id: 10,
+                title: "Tracer le Sentier d'une Nouvelle Aube",
+                description: "Synthétiser votre parcours et créer votre plan d'action",
+                exercise: {
+                    title: "Dessinez la Carte de votre Prochaine Aventure",
+                    objective: "Créer une vision concrète et un premier pas vers votre nouvelle vie.",
+                    questions: [
+                        {
+                            label: "Manifeste personnel - Qui choisissez-vous d'être maintenant ?",
+                            key: "manifeste_personnel",
+                            placeholder: "Vos valeurs directrices, votre mission, vos engagements envers vous-même..."
+                        },
+                        {
+                            label: "Semaine idéale - À quoi ressemble une semaine épanouissante pour vous ?",
+                            key: "semaine_ideale",
+                            placeholder: "Répartition entre apprentissage, création, contribution, corps, lien social..."
+                        },
+                        {
+                            label: "Premier pas concret - Quelle action simple ferez-vous dans les 48h ?",
+                            key: "premier_pas",
+                            placeholder: "L'action la plus petite mais concrète pour démarrer..."
+                        }
+                    ]
+                }
+            }
         ];
 
-        function drawQuestion() {
-            const randomIndex = Math.floor(Math.random() * questions.length);
-            document.getElementById('question').innerText = questions[randomIndex];
+        // Stockage des données
+        let userData = JSON.parse(localStorage.getItem('retourSecondVieData')) || {};
+        let completedChapters = JSON.parse(localStorage.getItem('completedChapters')) || [];
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            renderChapters();
+            updateProgress();
+            updateStats();
+        });
+
+        function renderChapters() {
+            const grid = document.getElementById('chapterGrid');
+            grid.innerHTML = '';
+
+            chapters.forEach(chapter => {
+                const isCompleted = completedChapters.includes(chapter.id);
+                const isCurrent = !isCompleted && (completedChapters.length === 0 || completedChapters.length + 1 === chapter.id);
+                
+                const card = document.createElement('div');
+                card.className = `chapter-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}`;
+                card.onclick = () => openChapter(chapter);
+
+                card.innerHTML = `
+                    <div class="chapter-number">${isCompleted ? '✓' : chapter.id}</div>
+                    <h3 class="chapter-title">${chapter.title}</h3>
+                    <p class="chapter-description">${chapter.description}</p>
+                    <div class="exercise-status">
+                        <div class="status-icon ${isCompleted ? 'completed' : isCurrent ? 'current' : ''}">
+                            ${isCompleted ? '✓' : isCurrent ? '!' : '?'}
+                        </div>
+                        <span>${isCompleted ? 'Exercice terminé' : isCurrent ? 'À faire maintenant' : 'Exercice en attente'}</span>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
         }
-    </script>
-</body>
-</html>
+
+        function openChapter(chapter) {
+            const modal = document.getElementById('exerciseModal');
+            const title = document.getElementById('modalTitle');
+            const content = document.getElementById('modalContent');
+
+            title.textContent = `Chapitre ${chapter.id}: ${chapter.exercise.title}`;
+            
+            content.innerHTML = `
+                <div class="exercise-section">
+                    <h3 class="exercise-title">Objectif:</h3>
+                    <p>${chapter.exercise.objective}</p>
+                </div>
+                
+                ${chapter.exercise.questions.map(q => `
+                    <div class="question-group">
+                        <label class="question-label">${q.label}</label>
+                        <textarea 
+                            id="${q.key}" 
+                            placeholder="${q.placeholder}"
+                        >${userData[q.key] || ''}</textarea>
+                    </div>
+                `).join('')}
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="saveChapterData(${chapter.id})">💾 Sauvegarder</button>
+                    <button class="btn btn-success" onclick="completeChapter(${chapter.id})">✅ Marquer comme terminé</button>
+                    <button class="btn btn-secondary" onclick
