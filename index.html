@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Seconde Vie - Carnet Interactif</title>
   <style>
@@ -26,7 +26,7 @@
       font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text);
-      transition: background 0.3s, color 0.3s;
+      transition: background .3s, color .3s;
     }
     header {
       display: flex;
@@ -54,13 +54,13 @@
     #sidebar button {
       width: 100%;
       text-align: left;
-      padding: 0.75rem;
-      margin-bottom: 0.5rem;
+      padding: .75rem;
+      margin-bottom: .5rem;
       background: transparent;
       border: none;
       cursor: pointer;
       border-radius: 6px;
-      transition: background 0.2s;
+      transition: background .2s;
     }
     #sidebar button:hover {
       background: var(--border);
@@ -83,7 +83,7 @@
       padding: 1rem;
       border-radius: 8px;
       margin-bottom: 1.5rem;
-      font-size: 0.95rem;
+      font-size: .95rem;
       line-height: 1.6;
     }
     textarea {
@@ -98,7 +98,7 @@
     }
     .btn {
       margin-top: 1rem;
-      padding: 0.75rem 1.5rem;
+      padding: .75rem 1.5rem;
       background: var(--accent);
       color: white;
       border: none;
@@ -116,7 +116,7 @@
       height: 100%;
       background: var(--accent);
       width: 0%;
-      transition: width 0.3s;
+      transition: width .3s;
     }
     .download-section {
       margin-top: 3rem;
@@ -127,23 +127,10 @@
     .download-section h3 {
       margin-top: 0;
     }
-    .prompt-box {
-      background: #f3f4f6;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-top: 1rem;
-      font-family: monospace;
-      font-size: 0.9rem;
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-    [data-theme="dark"] .prompt-box {
-      background: #1f2937;
-    }
     @media (max-width: 768px) {
       #sidebar {
         transform: translateX(-100%);
-        transition: transform 0.3s;
+        transition: transform .3s;
       }
       #sidebar.open {
         transform: translateX(0);
@@ -176,12 +163,11 @@
 <footer>
   <div class="download-section">
     <h3>🧠 Assistant IA</h3>
-    <p>Copie ce prompt pour une IA afin de synthétiser ta démarche et te proposer des actions concrètes :</p>
-    <div class="prompt-box" id="promptBox"></div>
-    <button class="btn" onclick="generatePrompt()">🔄 Générer le prompt</button>
+    <p>Clique pour télécharger un fichier contenant le prompt prêt à envoyer à ton IA :</p>
+    <button class="btn" onclick="generatePrompt()">📥 Télécharger le prompt IA</button>
     
-    <h3 style="margin-top: 2rem;">📥 Export</h3>
-    <button class="btn" onclick="downloadLog()">Télécharger mon carnet</button>
+    <h3 style="margin-top: 2rem;">📥 Export global</h3>
+    <button class="btn" onclick="downloadLog()">Télécharger mon carnet complet</button>
   </div>
 </footer>
 
@@ -418,7 +404,13 @@ En tant qu'assistant spécialisé en transition de vie, merci de :
 2. Me proposer 3 idées concrètes de projets ou engagements adaptés à moi
 3. Me suggérer une phrase d'accroche pour présenter ma "seconde vie" à mes proches`;
 
-    document.getElementById('promptBox').textContent = prompt;
+    // Téléchargement direct
+    const blob = new Blob([prompt], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'prompt-ia-seconde-vie.txt';
+    a.click();
   }
 
   function downloadLog() {
