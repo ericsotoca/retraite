@@ -3,254 +3,341 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>La Retraite, une Seconde Vie - Carnet Interactif</title>
+  <title>Mon Carnet de Seconde Vie</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
     :root {
-      --primary: #2c3e50;
-      --accent: #e67e22;
-      --bg: #fdfdfd;
-      --text: #333;
+      --bg: #ffffff;
+      --text: #1a1a1a;
+      --accent: #d97706;
+      --primary: #111827;
+      --border: #e5e7eb;
+      --success: #16a34a;
+    }
+    [data-theme="dark"] {
+      --bg: #111827;
+      --text: #f9fafb;
+      --border: #374151;
     }
     body {
       margin: 0;
-      font-family: "Segoe UI", sans-serif;
+      font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
     }
     header {
-      background: var(--primary);
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    nav {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 0.5rem;
-      background: #ecf0f1;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
     }
-    nav button {
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 260px;
+      height: 100%;
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      padding: 2rem 1rem;
+      overflow-y: auto;
+    }
+    #sidebar h3 {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+    #sidebar button {
+      width: 100%;
+      text-align: left;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      background: transparent;
       border: none;
-      padding: 0.5rem 1rem;
-      background: white;
-      border-radius: 4px;
       cursor: pointer;
-      font-size: 0.9rem;
+      border-radius: 6px;
+      transition: background 0.2s;
     }
-    nav button.active {
-      background: var(--accent);
+    #sidebar button:hover {
+      background: var(--border);
+    }
+    #sidebar button.done {
+      background: var(--success);
       color: white;
     }
     main {
-      max-width: 800px;
-      margin: auto;
-      padding: 1rem;
+      margin-left: 280px;
+      padding: 2rem;
+      max-width: 700px;
     }
-    textarea, input[type="text"] {
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
+    h2 {
+      font-size: 1.5rem;
       margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-family: inherit;
     }
-    .hidden {
-      display: none;
+    textarea {
+      width: 100%;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      resize: vertical;
+      min-height: 120px;
     }
-    .progress {
-      margin: 1rem 0;
-      font-weight: bold;
-    }
-    button.save {
+    .btn {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
       background: var(--accent);
       color: white;
       border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
     }
-    footer {
-      text-align: center;
-      padding: 2rem 1rem;
-      font-size: 0.9rem;
-      color: #777;
+    .progress-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.3s;
+    }
+    @media (max-width: 768px) {
+      #sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+      }
+      #sidebar.open {
+        transform: translateX(0);
+      }
+      main {
+        margin-left: 0;
+        padding: 1rem;
+      }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>La Retraite, une Seconde Vie</h1>
-  <p>Carnet interactif de réinvention</p>
+  <button onclick="toggleSidebar()">☰</button>
+  <h1>Mon Carnet de Seconde Vie</h1>
+  <button onclick="toggleTheme()">🌗</button>
 </header>
 
-<nav id="nav"></nav>
+<aside id="sidebar">
+  <h3>Progression</h3>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress"></div>
+  </div>
+  <nav id="nav"></nav>
+</aside>
 
 <main id="content"></main>
 
 <footer>
-  <button class="save" onclick="downloadLog()">Télécharger mon carnet</button>
-  <p>© Eric Sotoca - Version interactive</p>
+  <button class="btn" onclick="downloadLog()">📥 Télécharger mon carnet</button>
 </footer>
 
 <script>
   const chapters = [
     {
-      title: "Chapitre 1 - Le Grand Vide ou le Champ des Possibles ?",
+      title: "Chapitre 1 – Le Grand Vide ou le Champ des Possibles ?",
       exercise: `
-        <h2>Journal de Bord - Cartographier le Point de Départ</h2>
-        <p>Répondez chaque jour pendant une semaine à ces trois questions :</p>
-        <label>1. Ma Météo Intérieure :</label>
-        <textarea data-key="jour1-meteo" rows="3"></textarea>
-        <label>2. Le Poids du Passé (ce qui manque) :</label>
-        <textarea data-key="jour1-passe" rows="3"></textarea>
-        <label>3. La Légèreté du Présent (ce qui ne manque pas) :</label>
-        <textarea data-key="jour1-present" rows="3"></textarea>
+        <h2>Journal de bord – Cartographier le point de départ</h2>
+        <label>1. Ma météo intérieure aujourd’hui :</label>
+        <textarea data-key="c1-meteo" placeholder="Ex. : Je me sens vide, mais curieux..."></textarea>
+
+        <label>2. Ce qui m’a manqué de mon ancienne vie :</label>
+        <textarea data-key="c1-manque" placeholder="Ex. : Les collègues, le rythme, les objectifs..."></textarea>
+
+        <label>3. Ce qui ne m’a pas manqué :</label>
+        <textarea data-key="c1-pas-manque" placeholder="Ex. : Les réunions interminables..."></textarea>
       `
     },
     {
-      title: "Chapitre 2 - Dire au revoir pour mieux se retrouver",
+      title: "Chapitre 2 – Dire au revoir pour mieux se retrouver",
       exercise: `
-        <h2>Lettre de Transition</h2>
-        <p>Écrivez une lettre à votre carrière passée :</p>
-        <label>1. La Gratitude (ce que vous remerciez) :</label>
-        <textarea data-key="lettre-gratitude" rows="4"></textarea>
-        <label>2. Les Griefs et Regrets :</label>
-        <textarea data-key="lettre-griefs" rows="4"></textarea>
-        <label>3. L’Adieu :</label>
-        <textarea data-key="lettre-adieu" rows="4"></textarea>
+        <h2>Lettre de transition</h2>
+        <label>1. Gratitude :</label>
+        <textarea data-key="c2-gratitude" placeholder="Merci pour..."></textarea>
+
+        <label>2. Griefs & regrets :</label>
+        <textarea data-key="c2-griefs" placeholder="Je regrette..."></textarea>
+
+        <label>3. L’adieu :</label>
+        <textarea data-key="c2-adieu" placeholder="Je te laisse maintenant..."></textarea>
       `
     },
     {
-      title: "Chapitre 3 - Les Cartes Routières de notre Esprit",
+      title: "Chapitre 3 – Les Cartes Routières de notre Esprit",
       exercise: `
-        <h2>Architecte de ses Croyances</h2>
+        <h2>Architecte de tes croyances</h2>
         <label>Croyance limitante :</label>
-        <textarea data-key="croyance-limitante" rows="2"></textarea>
+        <textarea data-key="c3-limitante" placeholder="Ex. : Je ne suis utile que si je produis..."></textarea>
+
         <label>Nouvelle croyance aidante :</label>
-        <textarea data-key="croyance-nouvelle" rows="2"></textarea>
+        <textarea data-key="c3-nouvelle" placeholder="Ex. : Ma valeur est dans qui je suis..."></textarea>
       `
     },
     {
-      title: "Chapitre 4 - L’Art de Vivre, Ici et Maintenant",
+      title: "Chapitre 4 – L’Art de Vivre, Ici et Maintenant",
       exercise: `
-        <h2>Ancre de Pleine Conscience</h2>
-        <p>Choisissez une activité quotidienne (café, douche, marche...) et décrivez ce que vous ressentez en y apportant toute votre attention :</p>
-        <textarea data-key="pleine-conscience" rows="5"></textarea>
+        <h2>Ancre de pleine conscience</h2>
+        <label>Activité choisie (café, douche, marche...) :</label>
+        <input type="text" data-key="c4-activite" placeholder="Ex. : Boire mon café" />
+
+        <label>Ce que j’ai ressenti en y apportant toute mon attention :</label>
+        <textarea data-key="c4-sensation" placeholder="Ex. : J’ai senti la chaleur, l’arôme, le goût..."></textarea>
       `
     },
     {
-      title: "Chapitre 5 - À la recherche de son Nord intérieur",
+      title: "Chapitre 5 – À la recherche de son Nord intérieur",
       exercise: `
-        <h2>Archeologie de votre Ikigaï (Partie 1)</h2>
-        <label>Ce que j’aime :</label>
-        <textarea data-key="ikigai-aime" rows="4"></textarea>
-        <label>Ce pour quoi je suis doué :</label>
-        <textarea data-key="ikigai-doue" rows="4"></textarea>
+        <h2>Ikigaï – Ce que j’aime & ce pour quoi je suis doué</h2>
+        <label>Ce que j’aime (passions, plaisirs simples) :</label>
+        <textarea data-key="c5-aime" placeholder="Ex. : Lire, bricoler, marcher, écouter du jazz..."></textarea>
+
+        <label>Ce pour quoi je suis doué (talents, facilités) :</label>
+        <textarea data-key="c5-doue" placeholder="Ex. : Organiser, raconter, réparer, écouter..."></textarea>
       `
     },
     {
-      title: "Chapitre 6 - Révéler le Super-Héros en Sommeil",
+      title: "Chapitre 6 – Révéler le Super-Héros en Sommeil",
       exercise: `
-        <h2>Mes 5 forces de caractère :</h2>
+        <h2>Mes 5 forces de caractère</h2>
         <ol>
-          <li><input type="text" data-key="force1" /></li>
-          <li><input type="text" data-key="force2" /></li>
-          <li><input type="text" data-key="force3" /></li>
-          <li><input type="text" data-key="force4" /></li>
-          <li><input type="text" data-key="force5" /></li>
+          <li><input type="text" data-key="c6-f1" placeholder="Ex. : Curiosité" /></li>
+          <li><input type="text" data-key="c6-f2" placeholder="Ex. : Honnêteté" /></li>
+          <li><input type="text" data-key="c6-f3" placeholder="Ex. : Humour" /></li>
+          <li><input type="text" data-key="c6-f4" placeholder="Ex. : Patience" /></li>
+          <li><input type="text" data-key="c6-f5" placeholder="Ex. : Créativité" /></li>
         </ol>
       `
     },
     {
-      title: "Chapitre 7 - Devenir l’auteur de sa propre légende",
+      title: "Chapitre 7 – Devenir l’auteur de sa propre légende",
       exercise: `
-        <h2>Quatrième de couverture de mon Tome 2</h2>
-        <label>Titre de votre nouveau chapitre :</label>
-        <input type="text" data-key="tome2-titre" />
-        <label>Résumé de votre histoire (à la 3e personne) :</label>
-        <textarea data-key="tome2-resume" rows="6"></textarea>
+        <h2>Titre & quatrième de couverture de mon Tome 2</h2>
+        <label>Titre :</label>
+        <input type="text" data-key="c7-titre" placeholder="Ex. : Les Chroniques d’un Bâtisseur de Seconde Vie" />
+
+        <label>Résumé (à la 3e personne) :</label>
+        <textarea data-key="c7-resume" placeholder="Ex. : Après 40 ans de carrière, il découvre que..."></textarea>
       `
     },
     {
-      title: "Chapitre 8 - L’Héritage que nous laissons au Monde",
+      title: "Chapitre 8 – L’Héritage que nous laissons au Monde",
       exercise: `
-        <h2>Contribution personnelle</h2>
-        <label>Qu’est-ce que la vie attend de moi ?</label>
-        <textarea data-key="contribution" rows="5"></textarea>
+        <h2>Contribution – Qu’est-ce que la vie attend de moi ?</h2>
+        <label>Idées concrètes pour transmettre ce que j’ai de meilleur :</label>
+        <textarea data-key="c8-contribution" placeholder="Ex. : Donner un cours d’histoire locale, réparer des jouets, partager mon herbier..."></textarea>
       `
     },
     {
-      title: "Chapitre 9 - Écouter les Murmures du Corps",
+      title: "Chapitre 9 – Écouter les Murmures du Corps",
       exercise: `
         <h2>Scan corporel & posture ressource</h2>
         <label>Message de mon corps aujourd’hui :</label>
-        <textarea data-key="corps-message" rows="3"></textarea>
-        <label>Ma posture ressource (comment je me tiens) :</label>
-        <textarea data-key="posture-ressource" rows="3"></textarea>
+        <textarea data-key="c9-corps" placeholder="Ex. : Tension dans les épaules => je porte un poids mental..."></textarea>
+
+        <label>Ma posture ressource (comment je me tiens quand je me sens aligné) :</label>
+        <textarea data-key="c9-posture" placeholder="Ex. : Dos droit, épaules basses, regard ouvert..."></textarea>
       `
     },
     {
-      title: "Chapitre 10 - Tracer le Sentier d’une Nouvelle Aube",
+      title: "Chapitre 10 – Tracer le Sentier d’une Nouvelle Aube",
       exercise: `
-        <h2>Ma semaine idéale (intentions)</h2>
+        <h2>Ma semaine idéale (intentions souples)</h2>
         <label>Lundi :</label>
-        <textarea data-key="semaine-lundi" rows="2"></textarea>
+        <textarea data-key="c10-lundi" placeholder="Ex. : Matin – lecture sur Rome / Après-midi – bricolage"></textarea>
+
         <label>Mardi :</label>
-        <textarea data-key="semaine-mardi" rows="2"></textarea>
+        <textarea data-key="c10-mardi" placeholder="Ex. : Marche en forêt + appel à un ami"></textarea>
+
         <label>Mercredi :</label>
-        <textarea data-key="semaine-mercredi" rows="2"></textarea>
+        <textarea data-key="c10-mercredi" placeholder="Ex. : Atelier bois + temps avec petits-enfants"></textarea>
+
         <label>Jeudi :</label>
-        <textarea data-key="semaine-jeudi" rows="2"></textarea>
+        <textarea data-key="c10-jeudi" placeholder="Ex. : Visite guidée au musée + jazz le soir"></textarea>
+
         <label>Vendredi :</label>
-        <textarea data-key="semaine-vendredi" rows="2"></textarea>
+        <textarea data-key="c10-vendredi" placeholder="Ex. : Cours d’histoire bénévole + apéro avec Cécile"></textarea>
+
         <label>Samedi :</label>
-        <textarea data-key="semaine-samedi" rows="2"></textarea>
+        <textarea data-key="c10-samedi" placeholder="Ex. : Marché + jardinage + film en famille"></textarea>
+
         <label>Dimanche :</label>
-        <textarea data-key="semaine-dimanche" rows="2"></textarea>
+        <textarea data-key="c10-dimanche" placeholder="Ex. : Rien de planifié – improvisation & repos"></textarea>
       `
     }
   ];
 
-  const nav = document.getElementById('nav');
-  const content = document.getElementById('content');
-
   let current = 0;
 
-  function renderNav() {
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+
+  function toggleTheme() {
+    const theme = document.documentElement.getAttribute('data-theme');
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  }
+
+  function renderSidebar() {
+    const nav = document.getElementById('nav');
     nav.innerHTML = '';
     chapters.forEach((chap, i) => {
       const btn = document.createElement('button');
-      btn.textContent = i + 1;
-      btn.className = i === current ? 'active' : '';
+      btn.textContent = `${i + 1}. ${chap.title}`;
+      if (localStorage.getItem(`done-${i}`)) btn.classList.add('done');
       btn.onclick = () => {
         current = i;
         render();
+        if (window.innerWidth < 768) toggleSidebar();
       };
       nav.appendChild(btn);
     });
   }
 
   function render() {
-    renderNav();
+    renderSidebar();
     const chap = chapters[current];
-    content.innerHTML = `
+    document.getElementById('content').innerHTML = `
       <h2>${chap.title}</h2>
       ${chap.exercise}
-      <button class="save" onclick="saveAll()">Sauvegarder</button>
+      <button class="btn" onclick="markDone()">✅ J’ai terminé ce chapitre</button>
     `;
     loadAll();
+    updateProgress();
+  }
+
+  function markDone() {
+    saveAll();
+    localStorage.setItem(`done-${current}`, 'true');
+    renderSidebar();
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const total = chapters.length;
+    const done = [...Array(total).keys()].filter(i => localStorage.getItem(`done-${i}`)).length;
+    const percent = Math.round((done / total) * 100);
+    document.getElementById('progress').style.width = `${percent}%`;
   }
 
   function saveAll() {
     document.querySelectorAll('textarea, input[type="text"]').forEach(el => {
       if (el.dataset.key) localStorage.setItem(el.dataset.key, el.value);
     });
-    alert('Sauvegardé localement ✅');
   }
 
   function loadAll() {
@@ -260,18 +347,20 @@
   }
 
   function downloadLog() {
-    let log = `# Mon carnet de bord - La Retraite, une Seconde Vie\n\n`;
-    for (let i = 0; i < chapters.length; i++) {
-      log += `## ${chapters[i].title}\n\n`;
-      const els = document.createElement('div');
-      els.innerHTML = chapters[i].exercise;
-      els.querySelectorAll('textarea, input').forEach(el => {
+    let log = `# Mon carnet – La Retraite, une Seconde Vie\n\n`;
+    log += `Exporté le : ${new Date().toLocaleDateString()}\n\n`;
+    chapters.forEach((chap, i) => {
+      log += `## ${chap.title}\n\n`;
+      const div = document.createElement('div');
+      div.innerHTML = chap.exercise;
+      div.querySelectorAll('textarea, input').forEach(el => {
         if (el.dataset.key) {
           const val = localStorage.getItem(el.dataset.key) || '';
-          log += `**${el.previousElementSibling?.textContent || 'Note'}:** ${val}\n\n`;
+          const label = el.previousElementSibling?.textContent || 'Note';
+          log += `**${label}**\n${val}\n\n`;
         }
       });
-    }
+    });
     const blob = new Blob([log], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -280,6 +369,8 @@
     a.click();
   }
 
+  // Initialisation
+  document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
   render();
 </script>
 </body>
