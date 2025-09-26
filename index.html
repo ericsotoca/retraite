@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mon Carnet de Seconde Vie</title>
+  <title>Seconde Vie - Carnet Interactif</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
     :root {
@@ -18,6 +18,8 @@
       --bg: #111827;
       --text: #f9fafb;
       --border: #374151;
+      --primary: #ecf0f1;
+      --accent: #f39c12;
     }
     body {
       margin: 0;
@@ -76,6 +78,14 @@
       font-size: 1.5rem;
       margin-bottom: 1rem;
     }
+    .summary {
+      background: var(--border);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
     textarea {
       width: 100%;
       padding: 1rem;
@@ -108,6 +118,28 @@
       width: 0%;
       transition: width 0.3s;
     }
+    .download-section {
+      margin-top: 3rem;
+      padding: 2rem;
+      background: var(--border);
+      border-radius: 12px;
+    }
+    .download-section h3 {
+      margin-top: 0;
+    }
+    .prompt-box {
+      background: #f3f4f6;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    [data-theme="dark"] .prompt-box {
+      background: #1f2937;
+    }
     @media (max-width: 768px) {
       #sidebar {
         transform: translateX(-100%);
@@ -127,7 +159,7 @@
 
 <header>
   <button onclick="toggleSidebar()">☰</button>
-  <h1>Mon Carnet de Seconde Vie</h1>
+  <h1>Seconde Vie</h1>
   <button onclick="toggleTheme()">🌗</button>
 </header>
 
@@ -142,13 +174,22 @@
 <main id="content"></main>
 
 <footer>
-  <button class="btn" onclick="downloadLog()">📥 Télécharger mon carnet</button>
+  <div class="download-section">
+    <h3>🧠 Assistant IA</h3>
+    <p>Copie ce prompt pour une IA afin de synthétiser ta démarche et te proposer des actions concrètes :</p>
+    <div class="prompt-box" id="promptBox"></div>
+    <button class="btn" onclick="generatePrompt()">🔄 Générer le prompt</button>
+    
+    <h3 style="margin-top: 2rem;">📥 Export</h3>
+    <button class="btn" onclick="downloadLog()">Télécharger mon carnet</button>
+  </div>
 </footer>
 
 <script>
   const chapters = [
     {
       title: "Chapitre 1 – Le Grand Vide ou le Champ des Possibles ?",
+      summary: "Faire le deuil de l’ancienne vie professionnelle et accueillir le vide comme un espace de création.",
       exercise: `
         <h2>Journal de bord – Cartographier le point de départ</h2>
         <label>1. Ma météo intérieure aujourd’hui :</label>
@@ -163,20 +204,22 @@
     },
     {
       title: "Chapitre 2 – Dire au revoir pour mieux se retrouver",
+      summary: "Écrire une lettre de clôture à sa carrière pour honorer le passé et faire place nette.",
       exercise: `
         <h2>Lettre de transition</h2>
-        <label>1. Gratitude :</label>
+        <label>Gratitude :</label>
         <textarea data-key="c2-gratitude" placeholder="Merci pour..."></textarea>
 
-        <label>2. Griefs & regrets :</label>
+        <label>Griefs :</label>
         <textarea data-key="c2-griefs" placeholder="Je regrette..."></textarea>
 
-        <label>3. L’adieu :</label>
+        <label>Adieu :</label>
         <textarea data-key="c2-adieu" placeholder="Je te laisse maintenant..."></textarea>
       `
     },
     {
       title: "Chapitre 3 – Les Cartes Routières de notre Esprit",
+      summary: "Identifier ses croyances limitantes et les remplacer par des pensées plus libératrices.",
       exercise: `
         <h2>Architecte de tes croyances</h2>
         <label>Croyance limitante :</label>
@@ -188,6 +231,7 @@
     },
     {
       title: "Chapitre 4 – L’Art de Vivre, Ici et Maintenant",
+      summary: "S’entraîner à la pleine conscience pour savourer l’instant et calmer le mental.",
       exercise: `
         <h2>Ancre de pleine conscience</h2>
         <label>Activité choisie (café, douche, marche...) :</label>
@@ -199,6 +243,7 @@
     },
     {
       title: "Chapitre 5 – À la recherche de son Nord intérieur",
+      summary: "Débusquer ses passions profondes et ses talents oubliés pour dessiner sa carte intérieure.",
       exercise: `
         <h2>Ikigaï – Ce que j’aime & ce pour quoi je suis doué</h2>
         <label>Ce que j’aime (passions, plaisirs simples) :</label>
@@ -210,6 +255,7 @@
     },
     {
       title: "Chapitre 6 – Révéler le Super-Héros en Sommeil",
+      summary: "Nommer ses forces de caractère et apprendre à les utiliser au quotidien.",
       exercise: `
         <h2>Mes 5 forces de caractère</h2>
         <ol>
@@ -223,6 +269,7 @@
     },
     {
       title: "Chapitre 7 – Devenir l’auteur de sa propre légende",
+      summary: "Rédiger la quatrième de couverture de sa prochaine vie pour se donner une direction narrative.",
       exercise: `
         <h2>Titre & quatrième de couverture de mon Tome 2</h2>
         <label>Titre :</label>
@@ -234,6 +281,7 @@
     },
     {
       title: "Chapitre 8 – L’Héritage que nous laissons au Monde",
+      summary: "Transformer ses passions en contribution : donner ce que l’on a de meilleur au monde qui nous entoure.",
       exercise: `
         <h2>Contribution – Qu’est-ce que la vie attend de moi ?</h2>
         <label>Idées concrètes pour transmettre ce que j’ai de meilleur :</label>
@@ -242,6 +290,7 @@
     },
     {
       title: "Chapitre 9 – Écouter les Murmures du Corps",
+      summary: "Utiliser son corps comme boussole : repérer les tensions et les énergies pour ajuster sa vie au quotidien.",
       exercise: `
         <h2>Scan corporel & posture ressource</h2>
         <label>Message de mon corps aujourd’hui :</label>
@@ -253,6 +302,7 @@
     },
     {
       title: "Chapitre 10 – Tracer le Sentier d’une Nouvelle Aube",
+      summary: "Planifier une semaine « idéale » qui intègre apprentissage, création, contribution, corps et lien social.",
       exercise: `
         <h2>Ma semaine idéale (intentions souples)</h2>
         <label>Lundi :</label>
@@ -313,6 +363,7 @@
     const chap = chapters[current];
     document.getElementById('content').innerHTML = `
       <h2>${chap.title}</h2>
+      <div class="summary">${chap.summary}</div>
       ${chap.exercise}
       <button class="btn" onclick="markDone()">✅ J’ai terminé ce chapitre</button>
     `;
@@ -346,11 +397,36 @@
     });
   }
 
+  function generatePrompt() {
+    const data = [];
+    chapters.forEach((chap, i) => {
+      const div = document.createElement('div');
+      div.innerHTML = chap.exercise;
+      const keys = [...div.querySelectorAll('textarea, input')].map(el => el.dataset.key);
+      keys.forEach(key => {
+        const value = localStorage.getItem(key) || '';
+        data.push(`${key}: ${value}`);
+      });
+    });
+
+    const prompt = `Je viens de finir le parcours "Seconde Vie". Voici toutes mes réponses :
+
+${data.join('\n')}
+
+En tant qu'assistant spécialisé en transition de vie, merci de :
+1. Me faire un résumé de mon profil (passions, forces, valeurs)
+2. Me proposer 3 idées concrètes de projets ou engagements adaptés à moi
+3. Me suggérer une phrase d'accroche pour présenter ma "seconde vie" à mes proches`;
+
+    document.getElementById('promptBox').textContent = prompt;
+  }
+
   function downloadLog() {
-    let log = `# Mon carnet – La Retraite, une Seconde Vie\n\n`;
+    let log = `# Seconde Vie – Mon carnet complet\n\n`;
     log += `Exporté le : ${new Date().toLocaleDateString()}\n\n`;
     chapters.forEach((chap, i) => {
-      log += `## ${chap.title}\n\n`;
+      log += `## ${chap.title}\n`;
+      log += `*${chap.summary}*\n\n`;
       const div = document.createElement('div');
       div.innerHTML = chap.exercise;
       div.querySelectorAll('textarea, input').forEach(el => {
@@ -365,7 +441,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'mon-carnet-retraite.md';
+    a.download = 'seconde-vie-carnet.md';
     a.click();
   }
 
